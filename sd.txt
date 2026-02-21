@@ -1,0 +1,83 @@
+# ===============================
+# BEGIN LSCACHE
+# ===============================
+## LITESPEED WP CACHE PLUGIN - Do not edit the contents of this block! ##
+<IfModule LiteSpeed>
+RewriteEngine on
+CacheLookup on
+RewriteRule .* - [E=Cache-Control:no-autoflush]
+RewriteRule litespeed/debug/.*\.log$ - [F,L]
+RewriteRule \.litespeed_conf\.dat - [F,L]
+
+### marker ASYNC start ###
+RewriteCond %{REQUEST_URI} /wp-admin/admin-ajax\.php
+RewriteCond %{QUERY_STRING} action=async_litespeed
+RewriteRule .* - [E=noabort:1]
+### marker ASYNC end ###
+
+### marker DROPQS start ###
+CacheKeyModify -qs:fbclid
+CacheKeyModify -qs:gclid
+CacheKeyModify -qs:utm*
+CacheKeyModify -qs:_ga
+### marker DROPQS end ###
+
+</IfModule>
+## LITESPEED WP CACHE PLUGIN - Do not edit the contents of this block! ##
+# END LSCACHE
+
+
+# ===============================
+# FORCE TRAILING SLASH (CUSTOM SLUG)
+# ===============================
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Jangan ganggu file & folder asli
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Redirect slug tanpa slash → pakai slash
+RewriteCond %{REQUEST_URI} ^/([a-zA-Z0-9_-]+)$
+RewriteRule ^ %1/ [R=301,L]
+</IfModule>
+
+
+# ===============================
+# BEGIN WordPress
+# ===============================
+# As diretrizes entre BEGIN dan END WordPress
+# akan ditimpa WordPress — jangan edit di dalamnya
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+
+
+# ===============================
+# BEGIN LiteSpeed
+# ===============================
+<IfModule LiteSpeed>
+SetEnv noabort 1
+</IfModule>
+# END LiteSpeed
+
+
+# ===============================
+# Wordfence WAF
+# ===============================
+<IfModule LiteSpeed>
+php_value auto_prepend_file '/home/u884944273/domains/pgbank.digital/public_html/wordfence-waf.php'
+</IfModule>
+<IfModule lsapi_module>
+php_value auto_prepend_file '/home/u884944273/domains/pgbank.digital/public_html/wordfence-waf.php'
+</IfModule>
+# END Wordfence WAF
